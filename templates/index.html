@@ -1,0 +1,231 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Upload</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f4f4f9;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+    }
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* Centers .preview-box horizontally */
+      gap: 20px; /* Adds space between .upload-container and .preview-box */
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      color: #333;
+    }
+    .upload-container {
+      display: flex;
+      gap: 20px;
+    }
+    .upload-box, .preview-box {
+      flex: 1;
+      text-align: center;
+      padding: 20px;
+      border: 2px dashed #007bff;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px; /* Fixed height for both boxes */
+      width: 200px; /* Fixed width for both boxes */
+      margin: 10px; /* Add some spacing between the boxes */
+    }
+    .upload-box:hover {
+      background-color: #e6f0ff;
+    }
+    .upload-box label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #007bff;
+    }
+    .upload-box input[type="file"] {
+      display: none;
+    }
+    .upload-box p {
+      margin: 0;
+      font-size: 14px;
+      color: #666;
+    }
+    .upload-box img {
+      max-width: 100%;
+      max-height: 150px;
+      border-radius: 5px;
+      margin-top: 10px;
+      display: none; /* Hidden by default */
+      object-fit: contain; /* Ensure the image fits within the box without distortion */
+    }
+    #submit-btn {
+      padding: 12px 24px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+      margin-bottom: 20px;
+    }
+    #submit-btn:hover {
+      background-color: #0056b3;
+    }
+    .preview-box {
+      border: 2px dashed #ccc; /* Different border color for distinction */
+      height: 200px;
+    }
+    .preview-box p {
+      margin: 0;
+      font-size: 14px;
+      color: #666;
+    }
+    #merged-image {
+      max-width: 100%;
+      height: 200px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      display: none;
+    }
+    /* Spinner styling */
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: #09f;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Upload Your Images</h1>
+    <div class="main-container">
+      <div class="upload-container">
+        <div class="upload-box" onclick="document.getElementById('my-image').click()">
+          <label for="my-image">My Image</label>
+          <p>Click to upload your image</p>
+          <img id="preview-my-image" src="#" alt="Preview My Image">
+          <input type="file" id="my-image" accept="image/*" onchange="previewImage(event, 'preview-my-image')">
+        </div>
+        <div class="upload-box" onclick="document.getElementById('clothes-image').click()">
+          <label for="clothes-image">Clothes You Want to Try</label>
+          <p>Click to upload clothes image</p>
+          <img id="preview-clothes-image" src="#" alt="Preview Clothes Image">
+          <input type="file" id="clothes-image" accept="image/*" onchange="previewImage(event, 'preview-clothes-image')">
+        </div>
+      </div>
+      <div class="preview-box">
+        <p>Merged image will appear here</p>
+        <img id="merged-image" src="" alt="Merged Image">
+      </div>
+      <div id="spinner" class="spinner" style="display: none;"></div>
+    </div>
+    <button id="submit-btn">Submit</button>
+  </div>
+
+  <script>
+
+    // Function to preview the uploaded image
+    function previewImage(event, previewId) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const preview = document.getElementById(previewId);
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+          // Hide the placeholder text when an image is uploaded
+          preview.parentElement.querySelector('p').style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // Submit button functionality
+    document.getElementById('submit-btn').addEventListener('click', async function () {
+  const myImage = document.getElementById('my-image').files[0];
+  const clothesImage = document.getElementById('clothes-image').files[0];
+
+  if (!myImage || !clothesImage) {
+    alert('Please upload both images.');
+    return;
+  }
+
+  // Show the spinner
+  const spinner = document.getElementById('spinner');
+  spinner.style.display = 'block';
+
+  const formData = new FormData();
+  formData.append('my_image', myImage);
+  formData.append('clothes_image', clothesImage);
+
+  try {
+    const response = await fetch('/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to upload images.');
+    }
+
+    // Convert the response to a Blob (binary data)
+    const blob = await response.blob();
+
+    // Create a URL for the Blob
+    const imageUrl = URL.createObjectURL(blob);
+
+    // Display the returned image in the merged-image element
+    const mergedImage = document.getElementById('merged-image');
+    mergedImage.src = imageUrl;
+    mergedImage.style.display = 'block';
+
+    // Hide the placeholder text
+    document.querySelector('.preview-box p').style.display = 'none';
+  } catch (error) {
+    console.error('Error:', error);
+    alert('An error occurred while uploading the images.');
+  } finally {
+    // Hide the spinner whether the request succeeds or fails
+    spinner.style.display = 'none';
+  }
+});
+
+  </script>
+</body>
+</html>
