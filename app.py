@@ -3,6 +3,7 @@ import os
 from flask import Flask, request, send_file, render_template
 from gradio_client import Client, handle_file
 from PIL import Image
+import shutil
 from flask import jsonify
 import io
 
@@ -24,6 +25,7 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def merge_images():
+    delete_gradio_temp_files();
     person_img = request.files.get('my_image')
     apparel_img = request.files.get('clothes_image')
 
@@ -66,6 +68,25 @@ def merge_images():
     except Exception as e:
         return f"Error processing images: {str(e)}", 500
 
+
+def delete_gradio_temp_files():
+    temp_dir = '/tmp/gradio'
+
+    # Check if the directory exists
+    if os.path.exists(temp_dir):
+        for filename in os.listdir(temp_dir):
+            file_path = os.path.join(temp_dir, filename)
+            try:
+                # Remove files or directories
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print(f"Error deleting file {file_path}: {e}")
+        print("Temporary files deleted successfully.")
+    else:
+        print(f"Directory {temp_dir} does not exist.")
 
 if __name__ == '__main__':
     app.run(debug=True)
