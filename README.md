@@ -1,0 +1,1 @@
+Smart Closet AI is an AI-powered virtual try-on system that lets users preview how clothing looks on them before making a purchase. By combining the Leffa API with a user-friendly interface, the app overlays apparel onto a person’s photo realistically. This helps reduce returns, promotes sustainability, and creates a more personalized shopping experience.
